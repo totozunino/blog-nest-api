@@ -1,0 +1,28 @@
+version: "3"
+services:
+  db:
+    image: postgres:alpine3.15
+    restart: always
+    container_name: blog-nest-app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=blog
+  amqp:
+    image: rabbitmq:management
+    restart: always
+    container_name: blog-nest-app_amqp
+    ports:
+      - "4369:4369"
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+      - "25672:25672"
+
+volumes:
+  pgdata:
+    driver: local
