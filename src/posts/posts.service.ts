@@ -15,8 +15,8 @@ export class PostsService {
     return this.postRepository.find();
   }
 
-  async findOne(id: string): Promise<Post> {
-    const post = await this.postRepository.findOneBy({ id: +id });
+  async findOne(id: number): Promise<Post> {
+    const post = await this.postRepository.findOneBy({ id });
     if (!post) {
       throw new NotFoundException(`Post #${id} not found`);
     }
@@ -28,9 +28,9 @@ export class PostsService {
     return this.postRepository.save(post);
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
+  async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
     const post = await this.postRepository.preload({
-      id: +id,
+      id,
       ...updatePostDto,
     });
 
@@ -41,8 +41,8 @@ export class PostsService {
     return this.postRepository.save(post);
   }
 
-  async remove(id: string): Promise<Post> {
-    const post = await this.postRepository.findOneBy({ id: +id });
+  async remove(id: number): Promise<Post> {
+    const post = await this.postRepository.findOneBy({ id });
 
     return this.postRepository.remove(post);
   }
