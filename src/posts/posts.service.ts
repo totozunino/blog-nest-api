@@ -1,5 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PostStatusOptions } from 'src/enums';
+import { PostStatus } from 'src/posts-status/entities/post-status.entity';
+import { PostsStatusService } from 'src/posts-status/posts-status.service';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -9,6 +13,8 @@ import { Post } from './entities/post.entity';
 export class PostsService {
   constructor(
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    @Inject('POSTS_SERVICE') private readonly client: ClientProxy,
+    private readonly postsStatusService: PostsStatusService,
   ) {}
 
   findAll() {
@@ -23,9 +29,25 @@ export class PostsService {
     return post;
   }
 
-  create(createPostDto: CreatePostDto): Promise<Post> {
-    const post = this.postRepository.create(createPostDto);
-    return this.postRepository.save(post);
+  async create(createPostDto: CreatePostDto): Promise<PostStatus> {
+    const postStatus = await this.postsStatusService.create({
+      status: PostStatusOptions.IN_PROGRESS,
+    });
+
+    // setTimeout(() => {
+    //   if (Math.floor(Math.random() * 10) > 8) {
+    //     this.postsStatusService.update(postStatus.id, {
+    //       status: PostStatusOptions.FAILED,
+    //     });
+    //   } else {
+    this.client.emit('post-created', {
+      postStatusId: postStatus.id,
+      createdPostDto: createPostDto,
+    });
+    // }
+    // }, 5000);
+
+    return postStatus;
   }
 
   async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {

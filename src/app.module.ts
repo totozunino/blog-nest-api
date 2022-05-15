@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigurationModule } from './config/config.module';
 import { PostsModule } from './posts/posts.module';
+import { PostsStatusModule } from './posts-status/posts-status.module';
 
 @Module({
   imports: [
     ConfigurationModule,
     PostsModule,
+    PostsStatusModule,
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
@@ -24,7 +24,7 @@ import { PostsModule } from './posts/posts.module';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
